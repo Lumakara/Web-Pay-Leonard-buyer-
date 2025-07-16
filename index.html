@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leonard Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* =================================================================
+           1. CSS RESET & GLOBAL STYLES
+           ================================================================= */
+        :root {
+            --bg-color-light: #f0f2f5;
+            --text-color-light: #1c1e21;
+            --card-bg-light: rgba(255, 255, 255, 0.7);
+            --header-bg-light: rgba(255, 255, 255, 0.5);
+            --primary-glow-light: rgba(0, 123, 255, 0.5);
+
+            --bg-color-dark: #0d0c22;
+            --text-color-dark: #e4e6eb;
+            --card-bg-dark: rgba(26, 28, 51, 0.6);
+            --header-bg-dark: rgba(13, 12, 34, 0.4);
+            --primary-glow-dark: rgba(0, 255, 255, 0.6);
+            
+            --primary-color: #00ffff;
+            --secondary-color: #8A2BE2;
+            --accent-color: #ff00ff;
+
+            --font-display: 'Orbitron', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(-45deg, #0d0c22, #1a1c33, #3a1c53, #00334d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        body.light-mode {
+            --bg-color: var(--bg-color-light);
+            --text-color: var(--text-color-light);
+            --card-bg: var(--card-bg-light);
+            --header-bg: var(--header-bg-light);
+            --primary-glow: var(--primary-glow-light);
+            background: var(--bg-color-light);
+        }
+        
+        body:not(.light-mode) {
+            --bg-color: var(--bg-color-dark);
+            --text-color: var(--text-color-dark);
+            --card-bg: var(--card-bg-dark);
+            --header-bg: var(--header-bg-dark);
+            --primary-glow: var(--primary-glow-dark);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px var(--primary-glow), 0 0 12px var(--primary-glow);
+        }
+        
+        p {
+            line-height: 1.7;
+        }
+
+        .hidden { display: none !important; }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.8s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* =================================================================
+           2. SPLASH SCREEN
+           ================================================================= */
+        #splash-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color-dark);
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .splash-logo {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: var(--primary-color);
+            text-shadow: 0 0 15px var(--primary-color), 0 0 25px var(--accent-color);
+            animation: pulse 2s infinite ease-in-out;
+        }
+        
+        .splash-text {
+            font-family: var(--font-body);
+            color: var(--text-color-dark);
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            animation: fadeIn 2s 0.5s ease-in forwards;
+            opacity: 0;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* =================================================================
+           3. MAIN CONTENT LAYOUT (Header, Footer, Pages)
+           ================================================================= */
+        #main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            flex-grow: 1;
+            opacity: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+            flex-grow: 1;
+        }
+        
+        .page-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 160px); /* Full height minus header/footer */
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+
+        /* HEADER */
+        header {
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .nav-items {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .theme-toggle-btn {
+            background: none;
+            border: 1px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        .theme-toggle-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary-color);
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 1.5rem 5%;
+            text-align: center;
+            font-size: 0.9rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            color: var(--text-color);
+        }
+        
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: text-shadow 0.3s ease;
+        }
+
+        footer a:hover {
+            text-shadow: 0 0 5px var(--primary-glow);
+        }
+
+        /* =================================================================
+           4. PAGE-SPECIFIC STYLES
+           ================================================================= */
+        /* HOME PAGE */
+        #home-page h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+
+        #home-page p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+            color: var(--text-color);
+        }
+
+        .pay-btn {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            padding: 1rem 3rem;
+            border: 2px solid var(--primary-color);
+            background: transparent;
+            color: var(--primary-color);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .pay-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--primary-glow), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .pay-btn:hover {
+            background-color: var(--primary-glow);
+            color: var(--bg-color-dark);
+            box-shadow: 0 0 20px var(--primary-glow), 0 0 30px var(--accent-color);
+            transform: translateY(-5px);
+        }
+        
+        .pay-btn:hover::before {
+            left: 100%;
+        }
+
+        /* PAYMENT PAGE */
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 2rem;
+        }
+
+        .payment-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 20px var(--primary-glow);
+        }
+
+        .payment-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-logo {
+            width: 50px;
+            height: auto;
+        }
+
+        .payment-card-header h3 {
+            font-size: 1.8rem;
+            color: var(--text-color);
+        }
+        body.light-mode .payment-card-header h3 { color: #333; }
+        
+        .payment-card p {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .qr-code-container {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .qr-code-container img {
+            width: 100%;
+            max-width: 200px;
+            display: block;
+        }
+
+        .va-container {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px dashed var(--primary-color);
+        }
+
+        .va-number {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--bg-color-dark);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background-color: transparent;
+            color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+        
+        .action-btn.copied {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: #fff;
+        }
+
+        /* =================================================================
+           5. RESPONSIVE DESIGN
+           ================================================================= */
+        @media (max-width: 768px) {
+            #home-page h1 { font-size: 2.5rem; }
+            #home-page p { font-size: 1rem; }
+            .pay-btn { font-size: 1.2rem; padding: 0.8rem 2rem; }
+            .page-section { min-height: calc(100vh - 140px); }
+            header, footer { padding: 1rem 5%; }
+            .logo { font-size: 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .container { width: 95%; }
+            #home-page h1 { font-size: 2rem; }
+            #payment-page h2 { font-size: 1.8rem; }
+            .nav-items { gap: 1rem; }
+            .theme-toggle-btn { width: 35px; height: 35px; }
+            .theme-toggle-btn svg { width: 18px; height: 18px; }
+        }
+
+    </style>
+</head>
+<body class="dark-mode">
+
+    <div id="splash-screen">
+        <div class="splash-logo">Leonard Store</div>
+        <p class="splash-text">All Jasa Dan Produk Digital</p>
+    </div>
+
+    <div id="main-content" class="hidden">
+        
+        <header>
+            <a href="#" class="logo">Leonard Store</a>
+            <nav class="nav-items">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light mode">
+                    </button>
+            </nav>
+        </header>
+
+        <main class="container">
+            <section id="home-page" class="page-section fade-in">
+                <h1>Welcome Guyss</h1>
+                <p>Fast Proses Oleh Dev Kami</p>
+                <button id="pay-button" class="pay-btn">Next To Payment</button>
+            </section>
+
+<section id="payment-page" class="page-section">
+    <h2>Pilih Metode Pembayaran</h2>
+    <div class="payment-grid">
+
+        <div class="payment-card">
+            <div class="payment-card-header">
+                <h3>QRIS</h3>
+            </div>
+            <p>Scan kode QR di bawah menggunakan aplikasi perbankan atau e-wallet Anda.</p>
+            <div class="qr-code-container">
+<img id="qr-image" src="images/qris-pembayaran.jpg" alt="Kode QRIS">
+
+            </div>
+            <a id="download-qr-btn" href="images/qris-pembayaran.jpg" download="QRIS_Payment.png" class="action-btn">Download Gambar</a>
+        </div>
+        
+        <div class="payment-card">
+            <div class="payment-card-header">
+                <h3>DANA</h3>
+            </div>
+            <p>Transfer ke nomor DANA di bawah ini.</p>
+            <p class="account-name">a/n: Jhonatan</p>
+            <div class="va-container">
+                <div id="dana-phone" class="va-number">081230720245</div>
+            </div>
+            <button class="action-btn copy-btn" data-clipboard-target="#dana-phone">Salin Nomor</button>
+        </div>
+
+        <div class="payment-card">
+            <div class="payment-card-header">
+                <h3>GoPay</h3>
+            </div>
+            <p>Transfer ke nomor GoPay di bawah ini.</p>
+            <p class="account-name">a/n: Jhonatan</p>
+            <div class="va-container">
+                 <div id="gopay-phone" class="va-number">081230720245</div>
+            </div>
+            <button class="action-btn copy-btn" data-clipboard-target="#gopay-phone">Salin Nomor</button>
+        </div>
+        
+        <div class="payment-card">
+            <div class="payment-card-header">
+                <h3>OVO</h3>
+            </div>
+            <p>Transfer ke nomor OVO di bawah ini.</p>
+            <p class="account-name">a/n: Jhonatan</p>
+            <div class="va-container">
+                 <div id="ovo-phone" class="va-number">087882851699</div>
+            </div>
+            <button class="action-btn copy-btn" data-clipboard-target="#ovo-phone">Salin Nomor</button>
+        </div>
+
+        <div class="payment-card">
+            <div class="payment-card-header">
+                <h3>SEA BANK</h3>
+            </div>
+            <p>Transfer ke nomor SEA BANK di bawah ini.</p>
+            <p class="account-name">a/n: Jhonatan</p>
+            <div class="va-container">
+                 <div id="shopeepay-phone" class="va-number">901161650089</div>
+            </div>
+            <button class="action-btn copy-btn" data-clipboard-target="#shopeepay-phone">Salin Nomor</button>
+        </div>
+
+    </div>
+</section>
+
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 <a href="#">Lumakara</a>. Developer Website</p>
+            <p>Kontak: lum4kar4@gmail.com | +6285183</p>
+        </footer>
+
+    </div>
+
+    <audio id="click-sound" src="data:audio/mpeg;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU0AAAAAAD//gP4AB/gRgC3AMQCFAD8ATgCAADYAPwAaADYAPwAzAGEAQABJAFQAagCAAHsAewCKAIUAeAABAAUAAQABBwAdAHkApwDnAAEABQABAAEHAB0AeQCnAOcAAQAGAAQACAAgADsAXwBvAHgAegB3AHQAawBiAFgAUwBOAEkARwBHAEkATgBSAFcAWgBdAFsAVgBRAEsASQBGAEUARgBGAD8AOwA3ADYAMwAwAC0AKgApACcAJgAjACEAHwAdABoAGQAXABYAFQAUABMAEgARABAADwAOAAsACgAIAAYABQAEAAIAAgABAAAAAP//AwAAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAAAAP//AgABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAEAAQABAAAAAP//AAA=" preload="auto"></audio>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // --- ELEMENTS ---
+        const splashScreen = document.getElementById('splash-screen');
+        const mainContent = document.getElementById('main-content');
+        const homePage = document.getElementById('home-page');
+        const paymentPage = document.getElementById('payment-page');
+        const payButton = document.getElementById('pay-button');
+        const copyButtons = document.querySelectorAll('.copy-btn');
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const clickSound = document.getElementById('click-sound');
+
+        const sunIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.591a.75.75 0 11-1.06-1.06l1.591-1.591a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5h2.25a.75.75 0 01.75.75zM17.834 17.834a.75.75 0 01-1.06 0l-1.591-1.591a.75.75 0 111.06-1.06l1.591 1.591a.75.75 0 010 1.06zM12 19.5a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 19.5zM6.106 18.894a.75.75 0 011.06 0l1.591-1.591a.75.75 0 111.06 1.06l-1.591 1.591a.75.75 0 01-1.06 0zM3 12a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h2.25A.75.75 0 013 12zM6.166 6.166a.75.75 0 010-1.06l1.591-1.591a.75.75 0 111.06 1.06L7.227 6.166a.75.75 0 01-1.06 0z"/>
+            </svg>`;
+        
+        const moonIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 004.463-.945.75.75 0 01.819.162l.819.819a.75.75 0 01-.162.819A10.5 10.5 0 0118 21a10.5 10.5 0 01-10.5-10.5 10.5 10.5 0 014.718-8.472l.819-.819a.75.75 0 01.819.162z" clip-rule="evenodd" />
+            </svg>`;
+
+        // --- FUNCTIONS ---
+        const playSound = () => {
+            clickSound.currentTime = 0;
+            clickSound.play();
+        };
+
+        const showPage = (pageId) => {
+            homePage.classList.add('hidden');
+            paymentPage.classList.add('hidden');
+
+            const pageToShow = document.getElementById(pageId);
+            pageToShow.classList.remove('hidden');
+            pageToShow.classList.remove('fade-out');
+            pageToShow.classList.add('fade-in');
+        };
+
+        const updateTheme = (isDarkMode) => {
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            document.body.classList.toggle('light-mode', !isDarkMode);
+            themeToggleButton.innerHTML = isDarkMode ? sunIcon : moonIcon;
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        };
+
+        // --- INITIALIZATION & EVENT LISTENERS ---
+
+        // Splash Screen Logic
+        setTimeout(() => {
+            splashScreen.classList.add('fade-out');
+            splashScreen.addEventListener('animationend', () => {
+                splashScreen.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                mainContent.classList.add('fade-in');
+            }, { once: true });
+        }, 2500); // Splash screen duration
+
+        // Theme Toggle Logic
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // Set initial theme: saved theme > OS preference > default (dark)
+        const isInitialDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+        updateTheme(isInitialDark);
+        
+        themeToggleButton.addEventListener('click', () => {
+            const isCurrentlyDark = document.body.classList.contains('dark-mode');
+            updateTheme(!isCurrentlyDark);
+            playSound();
+        });
+
+        // Navigation Logic
+        payButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            playSound();
+            homePage.classList.add('fade-out');
+            homePage.addEventListener('animationend', () => {
+                showPage('payment-page');
+            }, { once: true });
+        });
+
+        // Copy to Clipboard Logic
+        copyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                playSound();
+                const targetSelector = button.getAttribute('data-clipboard-target');
+                const textToCopy = document.querySelector(targetSelector).innerText;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalText = button.innerText;
+                    button.innerText = 'Tersalin!';
+                    button.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        button.innerText = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Gagal menyalin:', err);
+                    alert('Gagal menyalin nomor. Mohon salin secara manual.');
+                });
+            });
+        });
+
+    });
+    </script>
+</body>
+</html>
